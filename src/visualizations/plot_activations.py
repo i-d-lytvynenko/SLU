@@ -73,4 +73,4 @@ class PlotActivations:
         axs[0].grid(alpha=0.4)
         axs[1].legend()
         axs[1].grid(alpha=0.4)
-        plt.show()
+        plt.tight_layout()
