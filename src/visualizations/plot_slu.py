@@ -1,36 +1,40 @@
-from dataclasses import dataclass
-
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+import torch
 from matplotlib import cm
 from matplotlib.colorbar import ColorbarBase
 from matplotlib.ticker import FormatStrFormatter
-import torch
+
+from ..types import File
 
 
-def relu(x):
+def relu(x: torch.Tensor) -> torch.Tensor:
     return torch.max(torch.tensor(0), x)
 
 
-def slu(x, k=0.0):
+def slu(x: torch.Tensor, k: float = 0.0) -> torch.Tensor:
     A = torch.log(1 + torch.abs(x))
     B = k * A.pow(2)
     return torch.where(x > 0, x + B, B - A)
 
 
-@dataclass
 class PlotSLU:
-    k_min: float = -0.5
-    k_max: float = 0.5
-    x_min: float = -20.
-    x_max: float = 20.
+    def __init__(self, fig_path: File,
+                 k_min: float = -0.5, k_max: float = 0.5,
+                 x_min: float = -20., x_max: float = 20.):
+        self.fig_path = fig_path
+        self.k_min = k_min
+        self.k_max = k_max
+        self.x_min = x_min
+        self.x_max = x_max
 
     def evaluate(self):
         X = torch.linspace(self.x_min, self.x_max, 500, requires_grad=True)
         X_arr = X.detach().numpy()
         k_values = np.linspace(self.k_min, self.k_max, 120)
 
-        _, axs = plt.subplots(1, 3, figsize=(10, 5), gridspec_kw={'width_ratios': [48, 4, 48]})
+        _, axs = plt.subplots(1, 3, figsize=(10, 5), gridspec_kw={
+                              'width_ratios': [48, 4, 48]})
         axs[0].set_title('SLU for different values of k')
         axs[1].set_title('k')
         axs[2].set_title('Derivative of SLU for different values of k')
@@ -50,8 +54,10 @@ class PlotSLU:
             Y.backward(torch.ones_like(X), retain_graph=True)
             Y_prime = X.grad
             k_norm = (k - self.k_min) / (self.k_max - self.k_min)
-            axs[0].plot(X_arr, Y.detach().numpy(), alpha=0.4, color=cm.plasma(k_norm))
-            axs[2].plot(X_arr, Y_prime.detach().numpy(), alpha=0.4, color=cm.plasma(k_norm))
+            axs[0].plot(X_arr, Y.detach().numpy(),
+                        alpha=0.4, color=cm.plasma(k_norm))
+            axs[2].plot(X_arr, Y_prime.detach().numpy(),
+                        alpha=0.4, color=cm.plasma(k_norm))
             X.grad.zero_()
 
         axs[0].grid(alpha=0.4)
@@ -61,3 +67,6 @@ class PlotSLU:
                      values=np.linspace(self.k_min, self.k_max, 100),
                      format=FormatStrFormatter('%.2f'), ticklocation='left')
         plt.tight_layout()
+
+        plt.savefig(self.fig_path)
+        plt.clf()

@@ -1,33 +1,33 @@
-from dataclasses import dataclass
-
 import matplotlib.pyplot as plt
 import torch
 
 from ..colors import COLORS
+from ..types import File
 
 
-def relu(x):
+def relu(x: torch.Tensor) -> torch.Tensor:
     return torch.max(torch.tensor(0), x)
 
 
-def elu(x, alpha=1.0):
+def elu(x: torch.Tensor, alpha: float = 1.0) -> torch.Tensor:
     return torch.where(x > 0, x, alpha*(torch.exp(x) - 1))
 
 
-def gelu(x):
+def gelu(x: torch.Tensor) -> torch.Tensor:
     return 0.5 * x * (1 + torch.tanh(torch.sqrt(torch.tensor(2/torch.pi)) * (x + 0.044715 * x**3)))
 
 
-def slu(x, k=0.0):
+def slu(x: torch.Tensor, k: float = 0.0) -> torch.Tensor:
     A = torch.log(1 + torch.abs(x))
     B = k * A.pow(2)
     return torch.where(x > 0, x + B, B - A)
 
 
-@dataclass
 class PlotActivations:
-    x_min: float = -5.
-    x_max: float = 5.
+    def __init__(self, fig_path: File, x_min: float = -5., x_max: float = 5.):
+        self.fig_path = fig_path
+        self.x_min = x_min
+        self.x_max = x_max
 
     def evaluate(self):
         X = torch.linspace(self.x_min, self.x_max, 500, requires_grad=True)
@@ -74,3 +74,6 @@ class PlotActivations:
         axs[1].legend()
         axs[1].grid(alpha=0.4)
         plt.tight_layout()
+
+        plt.savefig(self.fig_path)
+        plt.clf()

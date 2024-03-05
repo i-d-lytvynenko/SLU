@@ -25,6 +25,10 @@ profile = "black"
 line_length = 90
 lines_after_imports = 2
 
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
+
 [tool.flake8]
 max-line-length = 90
 ignore = ['E203', 'E501', 'W503', 'B950']

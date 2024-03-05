@@ -1,23 +1,23 @@
 from pathlib import Path
-from typing import ClassVar, Iterable, List, Optional, Tuple, Union
+from typing import Callable, ClassVar, Iterable, List, Optional, Tuple, Union
 
-import numpy as np
-import torch
+from torch import device
 
 
-File = Union[Path, str]
-Directory = Union[Path, str]
-Device = Union[str, torch.device]
+File = Path
+Directory = Path
+Device = Union[str, device]
 
 
 __all__ = (
     'File',
     'Directory',
     'Device',
+    'Callable',
+    'ClassVar',
     'Iterable',
     'List',
     'Optional',
     'Tuple',
     'Union',
-    'ClassVar',
 )

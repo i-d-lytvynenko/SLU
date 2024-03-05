@@ -1,29 +1,37 @@
+from pathlib import Path
+
 import fire
-from matplotlib.pyplot import savefig
+
 from src.visualizations import (
     PlotActivations,
     PlotSLU
 )
+from src.experiments import (
+    Classify2D
+)
+
+log_dir = Path('logs')
 
 
 def plot_activations():
-    PlotActivations().evaluate()
-    savefig('logs/activations.png')
+    PlotActivations(fig_path=log_dir/'activations.png').evaluate()
 
 
 def plot_SLU():
-    PlotSLU(x_min=-20, x_max=20).evaluate()
-    savefig('logs/slu_20.png')
-    PlotSLU(x_min=-3, x_max=3).evaluate()
-    savefig('logs/slu_3.png')
+    PlotSLU(x_min=-20, x_max=20, fig_path=log_dir/'slu_20.png').evaluate()
+    PlotSLU(x_min=-3, x_max=3, fig_path=log_dir/'slu_3.png').evaluate()
 
 
-def plot_loss():
-    pass
+def classify_spirals():
+    experiment = Classify2D(artifacts_dir=log_dir/'spirals', dataset='spirals')
+    experiment.train()
+    experiment.plot()
 
 
-def plot_gradients():
-    pass
+def classify_moons():
+    experiment = Classify2D(artifacts_dir=log_dir/'moons', dataset='moons', lr=3e-4, n_epochs=100)
+    experiment.train()
+    experiment.plot()
 
 
 if __name__ == "__main__":

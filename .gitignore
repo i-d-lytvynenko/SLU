@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Poetry venv folder
+.venv
+
 data/*
 models/*
 logs/*
