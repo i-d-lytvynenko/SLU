@@ -7,7 +7,7 @@ from sklearn.datasets import make_moons
 from ..colors import COLORS
 from ..layers import SLU
 from ..types import Callable, Directory, Tuple
-from ..utils import train
+from ..utils import train, smooth_data, to_scientific_notation
 from .base import BaseExperiment, BasePreprocessor
 
 
@@ -29,7 +29,8 @@ class Classify2D(BaseExperiment):
 
     def __init__(self, artifacts_dir: Directory, dataset: str,
                  n_samples: int = 2000, noise: float = .3,
-                 n_epochs: int = 50, lr: float = 1e-3, is_verbose: bool = True):
+                 n_epochs: int = 100, lr: float = 1e-3,
+                 is_verbose: bool = True, window_size: int = 40):
         assert dataset in Classify2D.datasets
         self.dataset = dataset
         self.artifacts_dir = artifacts_dir
@@ -39,6 +40,7 @@ class Classify2D(BaseExperiment):
         self.n_epochs = n_epochs
         self.lr = lr
         self.is_verbose = is_verbose
+        self.window_size = window_size
 
     @staticmethod
     def make_spirals(n_samples: int, noise: float) -> Tuple[np.ndarray, np.ndarray]:
@@ -101,7 +103,7 @@ class Classify2D(BaseExperiment):
                 model=net,
                 train_loader=train_loader,
                 val_loader=val_loader,
-                criterion=nn.MSELoss(),
+                criterion=nn.BCELoss(),
                 lr=self.lr,
                 n_epochs=self.n_epochs,
                 is_verbose=self.is_verbose
@@ -126,6 +128,8 @@ class Classify2D(BaseExperiment):
             )
         X = torch.tensor(X, dtype=torch.float32)
         y = torch.tensor(y, dtype=torch.float32)
+        if not hasattr(self.preprocessor, 'mean'):
+            self.preprocessor = torch.load(self.artifacts_dir/'preprocessor.pth')
         X = self.preprocessor.transform(X)
         X = X.numpy()
         y = y.numpy()
@@ -155,7 +159,21 @@ class Classify2D(BaseExperiment):
             plt.clf()
 
     def plot_loss(self) -> None:
-        ...
+        plt.figure(figsize=(10, 5))
+        for net_name in ['ReLU', 'SLU (shared)', 'SLU (individual)']:
+            subfolder_name = self.artifacts_dir/(net_name.replace(" ", "_"))
+            train_loss = torch.load(subfolder_name/'train_loss.pth')
+            train_loss = smooth_data(train_loss, self.window_size)
+            x_train = np.linspace(0, len(train_loss), len(train_loss))
+            plt.plot(x_train, train_loss, c=COLORS[net_name], label=f'{net_name} - train', alpha=0.7)
+            val_loss = torch.load(subfolder_name/'val_loss.pth')
+            val_loss = smooth_data(val_loss, self.window_size)
+            x_val = np.linspace(0, len(train_loss), len(val_loss))
+            plt.plot(x_val, val_loss, c=COLORS[net_name], label=f'{net_name} - val')
+        plt.legend()
+        plt.xlabel('Epoch')
+        plt.ylabel(f'Log Loss (lr = {to_scientific_notation(self.lr)})')
+        plt.savefig(self.artifacts_dir/'train_comparison.png')
         plt.clf()
 
     def plot(self) -> None:

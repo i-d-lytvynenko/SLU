@@ -6,6 +6,24 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.utils.data as data
 
+from .types import Union
+
+
+def smooth_data(data: np.ndarray, window_size: int) -> np.ndarray:
+    return np.convolve(data, np.ones(window_size)/window_size, mode='valid')
+
+
+def to_scientific_notation(num: Union[int, float]) -> str:
+    str_num = str(num)
+    if 'e' in str_num:
+        return str_num
+    str_num = f'{num:f}'
+    int_part, fractional_part = str_num.split('.')
+    precision = len(fractional_part.strip('0')) + len(int_part) - 1
+    if int_part == '0':
+        precision -= 1
+    return f'{num:.{precision}e}'
+
 
 def train(
     model: nn.Module,

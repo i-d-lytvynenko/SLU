@@ -1,4 +1,4 @@
-COLORS= {
+COLORS = {
     # general
     'ReLU': '#2CA02C',
     'ELU': '#FF7F0E',
