@@ -4,13 +4,26 @@ import torch
 import torch.utils.data as data
 from sklearn.model_selection import train_test_split
 
-from ..types import Directory, Tuple
+from ..types import Directory, Tuple, Type
+
+
+class BasePreprocessor(ABC):
+    def __init__(self):
+        self.is_trained = False
+
+    @abstractmethod
+    def fit(self, X: torch.Tensor, y: torch.Tensor) -> None:
+        ...
+
+    @abstractmethod
+    def transform(self, X: torch.Tensor, y: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+        ...
 
 
 class BaseExperiment(ABC):
-    def __post_init__(self):
-        self.artifacts_dir: Directory
-        self.preprocessor: BasePreprocessor
+    def __init__(self, artifacts_dir: Directory, Preprocessor: Type[BasePreprocessor]):
+        self.artifacts_dir = artifacts_dir
+        self.preprocessor = Preprocessor()
         self.artifacts_dir.mkdir(exist_ok=True)
 
     @abstractmethod
@@ -25,9 +38,9 @@ class BaseExperiment(ABC):
         -> Tuple[data.DataLoader, data.DataLoader]:
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
-        self.preprocessor.fit(X_train)
-        X_train = self.preprocessor.transform(X_train)
-        X_test = self.preprocessor.transform(X_test)
+        self.preprocessor.fit(X_train, y_train)
+        X_train, y_train = self.preprocessor.transform(X_train, y_train)
+        X_test, y_test = self.preprocessor.transform(X_test, y_test)
         self.artifacts_dir.mkdir(exist_ok=True)
         torch.save(self.preprocessor, self.artifacts_dir/'preprocessor.pth')
 
@@ -37,15 +50,3 @@ class BaseExperiment(ABC):
         val_loader = data.DataLoader(test_dataset, batch_size=batch_size)
 
         return train_loader, val_loader
-
-
-class BasePreprocessor(ABC):
-    @abstractmethod
-    def fit(self, X: torch.Tensor) -> None:
-        ...
-
-    @abstractmethod
-    def transform(self, X: torch.Tensor) -> torch.Tensor:
-        ...
-
-

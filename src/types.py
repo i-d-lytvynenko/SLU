@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Callable, ClassVar, Iterable, List, Optional, Tuple, Union
+from typing import Callable, ClassVar, Iterable, List, Optional, Tuple, Type, Union
 
 from torch import device
 
@@ -19,5 +19,6 @@ __all__ = (
     'List',
     'Optional',
     'Tuple',
+    'Type',
     'Union',
 )

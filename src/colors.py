@@ -13,4 +13,7 @@ COLORS = {
     'SLU (k = -0.2)': '#FC2F36',
     'SLU (k = 0)': '#D62728',
     'SLU (k = 0.2)': '#A81F22',
+
+    # other
+    'Sigmoid': '#17BECF',
 }
