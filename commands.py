@@ -12,6 +12,10 @@ from src.experiments import (
 )
 
 log_dir = Path('logs')
+log_dir.mkdir(exist_ok=True)
+
+data_dir = Path('data')
+data_dir.mkdir(exist_ok=True)
 
 
 def plot_activations() -> None:
