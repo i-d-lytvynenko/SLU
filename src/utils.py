@@ -47,7 +47,7 @@ def train(
             optimizer.zero_grad()
             train_outputs = model(train_inputs)
 
-            if isinstance(criterion, (nn.CrossEntropyLoss, nn.BCELoss, nn.BCEWithLogitsLoss)):
+            if isinstance(criterion, (nn.BCELoss, nn.BCEWithLogitsLoss)):
                 train_loss = criterion(train_outputs, train_targets.unsqueeze(1))
             else:
                 train_loss = criterion(train_outputs, train_targets)
@@ -59,7 +59,7 @@ def train(
                 model.train(False)
                 for val_inputs, val_targets in val_loader:
                     val_outputs = model(val_inputs)
-                    if isinstance(criterion, (nn.CrossEntropyLoss, nn.BCELoss, nn.BCEWithLogitsLoss)):
+                    if isinstance(criterion, (nn.BCELoss, nn.BCEWithLogitsLoss)):
                         val_loss = criterion(val_outputs, val_targets.unsqueeze(1))
                     else:
                         val_loss = criterion(val_outputs, val_targets)

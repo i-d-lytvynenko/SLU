@@ -8,7 +8,8 @@ from src.visualizations import (
 )
 from src.experiments import (
     Classify2D,
-    Regress1D
+    Regress1D,
+    ClassifyMNIST
 )
 
 log_dir = Path('logs')
@@ -57,6 +58,34 @@ def regress_1d_root(train: bool = True) -> None:
 
 def regress_1d_reciprocal(train: bool = True) -> None:
     experiment = Regress1D(artifacts_dir=log_dir/'reciprocal', dataset='reciprocal')
+    if train: experiment.train()
+    experiment.plot()
+
+
+def classify_mnist_4x64(train: bool = True, force_retrain = True) -> None:
+    experiment = ClassifyMNIST(artifacts_dir=log_dir/'mnist'/'4x64', force_retrain=force_retrain,
+                               n_layers=4, n_neurons=64)
+    if train: experiment.train()
+    experiment.plot()
+
+
+def classify_mnist_4x128(train: bool = True, force_retrain = True) -> None:
+    experiment = ClassifyMNIST(artifacts_dir=log_dir/'mnist'/'4x128', force_retrain=force_retrain,
+                               n_layers=4, n_neurons=128)
+    if train: experiment.train()
+    experiment.plot()
+
+
+def classify_mnist_8x64(train: bool = True, force_retrain = True) -> None:
+    experiment = ClassifyMNIST(artifacts_dir=log_dir/'mnist'/'8x64', force_retrain=force_retrain,
+                               n_layers=8, n_neurons=64)
+    if train: experiment.train()
+    experiment.plot()
+
+
+def classify_mnist_8x128(train: bool = True, force_retrain = True) -> None:
+    experiment = ClassifyMNIST(artifacts_dir=log_dir/'mnist'/'8x128', force_retrain=force_retrain,
+                               n_layers=8, n_neurons=128)
     if train: experiment.train()
     experiment.plot()
 

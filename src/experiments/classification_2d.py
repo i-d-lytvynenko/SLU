@@ -117,7 +117,7 @@ class Classify2D(BaseExperiment):
             torch.save(train_loss_log, subfolder_name/'train_loss.pth')
             torch.save(val_loss_log, subfolder_name/'val_loss.pth')
 
-        torch.save(self.nets, self.artifacts_dir/f'nets.pth')
+        torch.save(self.nets, self.artifacts_dir/'nets.pth')
 
     def plot_classification(self) -> None:
         if self.dataset == 'spirals':
