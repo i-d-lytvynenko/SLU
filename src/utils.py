@@ -6,7 +6,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.utils.data as data
 
-from .types import Union
+from .types import Union, Optional, Device
 
 
 def smooth_data(data: np.ndarray, window_size: int) -> np.ndarray:
@@ -32,8 +32,11 @@ def train(
     criterion: nn.modules.loss._Loss,
     lr: float = 1e-3,
     n_epochs: int = 50,
-    is_verbose: bool = False
+    is_verbose: bool = False,
+    device: Optional[Device] = None
 ):
+    device = torch.device(device or torch.device('cuda' if torch.cuda.is_available() else 'cpu'))
+    model = model.to(device)
     optimizer = optim.Adam(model.parameters(), lr=lr)
     train_loss_log = []
     val_loss_log = []
@@ -43,6 +46,8 @@ def train(
         ep_train_loss_log = []
         ep_val_loss_log = []
         for i, (train_inputs, train_targets) in enumerate(train_loader):
+            train_inputs = train_inputs.to(device)
+            train_targets = train_targets.to(device)
             model.train(True)
             optimizer.zero_grad()
             train_outputs = model(train_inputs)
@@ -58,6 +63,8 @@ def train(
             if i == int(len(train_loader) / 2):
                 model.train(False)
                 for val_inputs, val_targets in val_loader:
+                    val_inputs = val_inputs.to(device)
+                    val_targets = val_targets.to(device)
                     val_outputs = model(val_inputs)
                     if isinstance(criterion, (nn.BCELoss, nn.BCEWithLogitsLoss)):
                         val_loss = criterion(val_outputs, val_targets.unsqueeze(1))
