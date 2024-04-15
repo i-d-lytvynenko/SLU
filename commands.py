@@ -92,14 +92,14 @@ def classify_mnist_8x128(train: bool = True, force_retrain = True) -> None:
 
 
 def classify_cifar10_fc(train: bool = True, force_retrain = True) -> None:
-    experiment = ClassifyCIFAR10(artifacts_dir=log_dir/'cifar'/'FC', force_retrain=force_retrain,
+    experiment = ClassifyCIFAR10(artifacts_dir=log_dir/'cifar-10'/'FC', force_retrain=force_retrain,
                                  network_type='FC')
     if train: experiment.train()
     experiment.plot()
 
 
 def classify_cifar10_cnn(train: bool = True, force_retrain = True) -> None:
-    experiment = ClassifyCIFAR10(artifacts_dir=log_dir/'cifar'/'CNN', force_retrain=force_retrain,
+    experiment = ClassifyCIFAR10(artifacts_dir=log_dir/'cifar-10'/'CNN', force_retrain=force_retrain,
                                  network_type='CNN')
     if train: experiment.train()
     experiment.plot()
