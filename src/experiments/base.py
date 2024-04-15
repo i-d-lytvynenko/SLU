@@ -24,7 +24,7 @@ class BaseExperiment(ABC):
     def __init__(self, artifacts_dir: Directory, Preprocessor: Type[BasePreprocessor]):
         self.artifacts_dir = artifacts_dir
         self.preprocessor = Preprocessor()
-        self.artifacts_dir.mkdir(exist_ok=True)
+        self.artifacts_dir.mkdir(parents=True, exist_ok=True)
 
     @abstractmethod
     def train(self) -> None:
