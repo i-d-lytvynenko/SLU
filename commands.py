@@ -9,7 +9,8 @@ from src.visualizations import (
 from src.experiments import (
     Classify2D,
     Regress1D,
-    ClassifyMNIST
+    ClassifyMNIST,
+    ClassifyCIFAR10
 )
 
 log_dir = Path('logs')
@@ -86,6 +87,20 @@ def classify_mnist_8x64(train: bool = True, force_retrain = True) -> None:
 def classify_mnist_8x128(train: bool = True, force_retrain = True) -> None:
     experiment = ClassifyMNIST(artifacts_dir=log_dir/'mnist'/'8x128', force_retrain=force_retrain,
                                n_layers=8, n_neurons=128)
+    if train: experiment.train()
+    experiment.plot()
+
+
+def classify_cifar10_fc(train: bool = True, force_retrain = True) -> None:
+    experiment = ClassifyCIFAR10(artifacts_dir=log_dir/'cifar'/'FC', force_retrain=force_retrain,
+                                 network_type='FC')
+    if train: experiment.train()
+    experiment.plot()
+
+
+def classify_cifar10_cnn(train: bool = True, force_retrain = True) -> None:
+    experiment = ClassifyCIFAR10(artifacts_dir=log_dir/'cifar'/'CNN', force_retrain=force_retrain,
+                                 network_type='CNN')
     if train: experiment.train()
     experiment.plot()
 
