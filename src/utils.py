@@ -6,7 +6,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.utils.data as data
 
-from .types import Union, Optional, Device
+from .types import Union, Optional, Device, Tuple, List
 
 
 def smooth_data(data: np.ndarray, window_size: int) -> np.ndarray:
@@ -34,7 +34,7 @@ def train(
     n_epochs: int = 50,
     is_verbose: bool = False,
     device: Optional[Device] = None
-):
+) -> Tuple[List, List]:
     device = torch.device(device or torch.device('cuda' if torch.cuda.is_available() else 'cpu'))
     model = model.to(device)
     optimizer = optim.Adam(model.parameters(), lr=lr)
@@ -45,7 +45,7 @@ def train(
         start_time = time.time()
         ep_train_loss_log = []
         ep_val_loss_log = []
-        for i, (train_inputs, train_targets) in enumerate(train_loader):
+        for train_batch_i, (train_inputs, train_targets) in enumerate(train_loader):
             train_inputs = train_inputs.to(device)
             train_targets = train_targets.to(device)
             model.train(True)
@@ -60,7 +60,7 @@ def train(
             train_loss.backward()
             optimizer.step()
 
-            if i == int(len(train_loader) / 2):
+            if train_batch_i == int(len(train_loader) / 2):
                 model.train(False)
                 for val_inputs, val_targets in val_loader:
                     val_inputs = val_inputs.to(device)
