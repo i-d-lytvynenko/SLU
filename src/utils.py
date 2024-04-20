@@ -1,4 +1,5 @@
 import time
+import random
 
 import numpy as np
 import torch
@@ -23,6 +24,12 @@ def to_scientific_notation(num: Union[int, float]) -> str:
     if int_part == '0':
         precision -= 1
     return f'{num:.{precision}e}'
+
+
+def set_global_seed(seed: int) -> None:
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
 
 
 def train(

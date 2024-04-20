@@ -12,10 +12,6 @@ from ..utils import smooth_data, to_scientific_notation, train
 from .base import BaseExperiment, BasePreprocessor
 
 
-np.random.seed(0)
-torch.manual_seed(0)
-
-
 class Preprocessor(BasePreprocessor):
     def __init__(self):
         super().__init__()

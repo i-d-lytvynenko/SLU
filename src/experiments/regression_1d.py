@@ -13,10 +13,6 @@ from ..utils import train, smooth_data, to_scientific_notation
 from .base import BaseExperiment, BasePreprocessor
 
 
-np.random.seed(0)
-torch.manual_seed(0)
-
-
 @dataclass
 class Dataset1D:
     name: str

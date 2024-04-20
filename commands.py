@@ -2,6 +2,7 @@ from pathlib import Path
 
 import fire
 
+from src.utils import set_global_seed
 from src.visualizations import (
     PlotActivations,
     PlotSLU
@@ -12,6 +13,9 @@ from src.experiments import (
     ClassifyMNIST,
     ClassifyCIFAR10
 )
+
+
+set_global_seed(0)
 
 log_dir = Path('logs')
 log_dir.mkdir(exist_ok=True)
