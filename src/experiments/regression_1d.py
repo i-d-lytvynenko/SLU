@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import torch.nn as nn
-from matplotlib.ticker import MaxNLocator
+from matplotlib.ticker import FormatStrFormatter, MaxNLocator
 
 from ..colors import COLORS
 from ..layers import SLU
@@ -161,6 +161,11 @@ class Regress1D(BaseExperiment):
             x_val = np.linspace(0, self.n_epochs, len(val_loss))
             plt.plot(x_val, val_loss,
                      c=COLORS[net_name], label=f'{net_name} - val')
+
+        plt.yscale('log')
+        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+        ax.yaxis.set_major_formatter(FormatStrFormatter('%.3g'))
+
         plt.xlim([0, self.n_epochs])
         plt.xlabel('Epoch')
         plt.ylabel(f'MSE Loss (lr = {to_scientific_notation(self.lr)})')
