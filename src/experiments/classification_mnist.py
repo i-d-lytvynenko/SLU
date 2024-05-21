@@ -1,7 +1,11 @@
-import matplotlib.pyplot as plt
+from pathlib import Path
+
 import numpy as np
 import torch
 import torch.nn as nn
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+import matplotlib.lines as mlines
 from matplotlib.ticker import FormatStrFormatter, MaxNLocator
 import torch.utils.data as data
 from torchvision import datasets, transforms
@@ -148,3 +152,78 @@ class ClassifyMNIST(BaseExperiment):
     def plot(self) -> None:
         self.plot_loss()
 
+
+class SummarizeMNIST(BaseExperiment):
+    def __init__(self, artifacts_dir: Directory, n_epochs: int = 20, window_size: int = 128):
+        super().__init__(artifacts_dir, Preprocessor)
+        self.window_size = window_size
+        self.n_epochs = n_epochs
+
+    def plot_best_scores(self) -> None:
+        _, ax = plt.subplots(figsize=(8, 6))
+        markers = ['o', '^', 'X', 'd', 'p', 'P', 'v', '*']
+        handles = []
+
+        for net_name in ['ReLU', 'ELU', 'GELU', 'SLU (shared)', 'SLU (individual)']:
+            handles.append(mpatches.Patch(label=net_name, color=COLORS[net_name]))
+
+        marker_i = 0
+        for item in Path(self.artifacts_dir).iterdir():
+            if not item.is_dir(): continue
+            architecture_name = item.name
+            handles.append(mlines.Line2D([], [], color='black', marker=markers[marker_i], linestyle='None',
+                           markersize=10, label=architecture_name))
+            marker_i += 1
+
+        handles.append(mlines.Line2D([], [], color='black', marker='s', linestyle='None',
+                       markersize=15, label='Average'))
+
+        with open(self.artifacts_dir/f'mean_best_scores.txt', 'wt') as f:
+            for net_name in ['ReLU', 'ELU', 'GELU', 'SLU (shared)', 'SLU (individual)']:
+                min_iter_list = []
+                min_loss_list = []
+                marker_i = 0
+                for item in Path(self.artifacts_dir).iterdir():
+                    if not item.is_dir(): continue
+                    architecture_name = item.name
+
+                    subfolder_name = self.artifacts_dir/architecture_name/(net_name.replace(' ', '_'))
+                    loss = torch.load(subfolder_name/'val_loss.pth')
+                    loss = smooth_data(loss, self.window_size)
+
+                    x = np.linspace(0, self.n_epochs, len(loss))
+                    min_iter = x[np.argmin(loss)]
+                    min_loss = np.min(loss)
+
+                    f.write(f'{net_name}; {architecture_name}; {min_iter}; {min_loss}\n')
+                    min_iter_list.append(min_iter)
+                    min_loss_list.append(min_loss)
+                    plt.scatter(min_iter, min_loss, c=COLORS[net_name], s=80, marker=markers[marker_i])
+                    marker_i += 1
+
+                mean_iter, mean_loss = np.mean(min_iter_list), np.mean(min_loss_list)
+                plt.scatter(mean_iter, mean_loss, c=COLORS[net_name], s=100,
+                            marker='s', edgecolors='k', linewidth=3)
+
+                f.write(f'\t{net_name}; {mean_iter}; {mean_loss}\n')
+
+        plt.yscale('log')
+        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+        ax.yaxis.set_major_formatter(FormatStrFormatter('%.3g'))
+        ax.yaxis.set_minor_formatter(FormatStrFormatter('%.3g'))
+
+        plt.xlabel('Epoch')
+        plt.ylabel(f'Log Loss')
+
+        plt.grid(which='both')
+
+        plt.legend(handles=handles, ncol=2)
+        plt.tight_layout()
+        plt.savefig(self.artifacts_dir/f'best_scores.png')
+        plt.clf()
+
+    def train(self) -> None:
+        pass
+
+    def plot(self) -> None:
+        self.plot_best_scores()

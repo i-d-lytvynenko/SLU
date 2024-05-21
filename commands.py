@@ -11,7 +11,9 @@ from src.experiments import (
     Classify2D,
     Regress1D,
     ClassifyMNIST,
-    ClassifyCIFAR10
+    SummarizeMNIST,
+    ClassifyCIFAR10,
+    SummarizeCIFAR10
 )
 
 
@@ -95,6 +97,10 @@ def classify_mnist_8x128(train: bool = True, force_retrain = True) -> None:
     experiment.plot()
 
 
+def summarize_mnist() -> None:
+    SummarizeMNIST(artifacts_dir=log_dir/'mnist').plot()
+
+
 def classify_cifar10_fc(train: bool = True, force_retrain = True) -> None:
     experiment = ClassifyCIFAR10(artifacts_dir=log_dir/'cifar-10'/'FC', force_retrain=force_retrain,
                                  network_type='FC')
@@ -107,6 +113,10 @@ def classify_cifar10_cnn(train: bool = True, force_retrain = True) -> None:
                                  network_type='CNN')
     if train: experiment.train()
     experiment.plot()
+
+
+def summarize_cifar10() -> None:
+    SummarizeCIFAR10(artifacts_dir=log_dir/'cifar-10').plot()
 
 
 if __name__ == '__main__':
