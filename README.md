@@ -278,12 +278,12 @@ This task is more complex than the MNIST classification and is also often used i
 
 ### FC 4x64
 
-![](logs/cifar-10/fc/train_comparison.png) | ![](logs/cifar-10/fc/val_comparison.png)
+![](logs/cifar-10/FC/train_comparison.png) | ![](logs/cifar-10/FC/val_comparison.png)
 -|-
 
 ### CNN
 
-![](logs/cifar-10/cnn/train_comparison.png) | ![](logs/cifar-10/cnn/val_comparison.png)
+![](logs/cifar-10/CNN/train_comparison.png) | ![](logs/cifar-10/CNN/val_comparison.png)
 -|-
 
 ### Results
